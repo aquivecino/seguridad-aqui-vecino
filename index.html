@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Seguridad Aquí Vecino</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1a2a">
+
+<style>
+body{
+  margin:0;
+  font-family: system-ui, Arial;
+  background: linear-gradient(180deg,#0b1a2a,#102840);
+  color:#fff;
+}
+header{
+  text-align:center;
+  padding:20px 10px 10px;
+}
+header h1{margin:0;font-size:22px;}
+header p{margin:4px 0 0;font-size:14px;opacity:.85}
+
+.container{padding:15px;max-width:900px;margin:auto}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+@media(min-width:600px){
+  .grid{grid-template-columns:repeat(4,1fr);}
+}
+
+.card{
+  background:rgba(255,255,255,.08);
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
+  cursor:pointer;
+}
+.card:active{transform:scale(.98)}
+.icon{font-size:34px}
+.label{margin-top:6px;font-weight:600;font-size:14px}
+.sub{font-size:12px;opacity:.8}
+
+.panic{
+  background:#c62828;
+  border-radius:18px;
+  padding:20px;
+  margin:20px 0;
+  text-align:center;
+  font-size:18px;
+  font-weight:700;
+}
+.panic small{display:block;font-size:13px;font-weight:400;margin-top:6px}
+
+.btn{margin-top:8px;padding:10px;border-radius:10px;background:#162c44}
+input{
+  width:100%;
+  margin-top:6px;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>Seguridad Aquí Vecino</h1>
+  <p>Ayudando a Chiloé</p>
+</header>
+
+<div class="container">
+
+<div class="grid" id="emergencias"></div>
+
+<div class="panic" onclick="activarPanico()">
+  🚨 BOTÓN DE PÁNICO
+  <small>Seguridad Comunitaria · Aquí Vecino</small>
+</div>
+
+<h3>Mis contactos de emergencia</h3>
+<div id="contactos"></div>
+
+</div>
+
+<script>
+const emergencias=[
+{n:'SAMU',t:'131',i:'🚑'},
+{n:'Bomberos',t:'132',i:'🚒'},
+{n:'Carabineros',t:'133',i:'👮'},
+{n:'PDI',t:'134',i:'🕵️'},
+{n:'CONAF',t:'130',i:'🌲'},
+{n:'Denuncia Seguro',t:'*4242',i:'📣'},
+{n:'Salud Mental',t:'*4141',i:'🧠'},
+{n:'Seg. Ciudadana Castro',t:'1427',i:'🏛️'}
+];
+
+const MAX=10;
+let contactos=JSON.parse(localStorage.getItem('av_cont'))||
+Array.from({length:MAX},()=>({n:'',t:''}));
+
+function render(){
+  const e=document.getElementById('emergencias');
+  e.innerHTML='';
+  emergencias.forEach(x=>{
+    e.innerHTML+=`
+    <div class="card" onclick="location.href='tel:${x.t}'">
+      <div class="icon">${x.i}</div>
+      <div class="label">${x.n}</div>
+      <div class="sub">${x.t}</div>
+    </div>`;
+  });
+
+  const c=document.getElementById('contactos');
+  c.innerHTML='';
+  contactos.forEach((x,i)=>{
+    c.innerHTML+=`
+    <input placeholder="Nombre" value="${x.n}" onchange="contactos[${i}].n=this.value;save()">
+    <input placeholder="Teléfono (+56…)" value="${x.t}" onchange="contactos[${i}].t=this.value;save()">
+    <div class="btn" onclick="llamar(${i})">📞 Llamar</div>
+    <div class="btn" onclick="sms(${i})">✉️ SMS</div>
+    <div class="btn" onclick="wa(${i})">🟢 WhatsApp</div>
+    <hr>`;
+  });
+}
+function save(){localStorage.setItem('av_cont',JSON.stringify(contactos));}
+function llamar(i){if(contactos[i].t)location.href='tel:'+contactos[i].t;}
+function sms(i){if(contactos[i].t)location.href='sms:'+contactos[i].t;}
+function wa(i){sendWA(contactos[i].t);}
+
+function activarPanico(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const {latitude,longitude,accuracy}=pos.coords;
+    let msg="🚨 EMERGENCIA – Seguridad Aquí Vecino\nPor favor, necesito ayuda.";
+    if(accuracy<100){
+      msg+=`\n📍 https://maps.google.com/?q=${latitude},${longitude}`;
+    }
+    enviarSecuencial(msg,0);
+  },()=>{
+    enviarSecuencial("🚨 EMERGENCIA – Seguridad Aquí Vecino\nPor favor, necesito ayuda.",0);
+  },{enableHighAccuracy:true,timeout:30000,maximumAge:0});
+}
+
+function enviarSecuencial(msg,i){
+  if(i>=contactos.length) return;
+  if(!contactos[i].t) return enviarSecuencial(msg,i+1);
+  const num=contactos[i].t.replace(/\D/g,'');
+  window.location.href=`https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+}
+
+render();
+</script>
+</body>
+</html>
