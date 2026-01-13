@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Seguridad Aquí Vecino</title>
+<title>Seguridad AquíVecino</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b1220">
 
@@ -101,8 +101,8 @@ header p{margin:6px 0 0;font-size:13px;opacity:.85}
 
 <header>
   <div class="settings" onclick="openSettings()">⚙️</div>
-  <h1>Seguridad Aquí Vecino</h1>
-  <p>Chiloé · Para un Chiloé más seguro</p>
+  <h1>Seguridad AquíVecino</h1>
+  <p>Chile · Para un Chile más seguro</p>
 </header>
 
 <!-- EMERGENCIAS COMUNITARIAS -->
@@ -144,6 +144,8 @@ header p{margin:6px 0 0;font-size:13px;opacity:.85}
     <div class="tile call" onclick="call('*4242')"><div class="icon">📣</div><div class="label">Denuncia</div><div class="sub">*4242</div></div>
     <div class="tile call" onclick="call('*4141')"><div class="icon">🧠</div><div class="label">Salud</div><div class="sub">*4141</div></div>
     <div class="tile call" onclick="call('223451100')"><div class="icon">🐄</div><div class="label">SAG</div><div class="sub">Denuncias</div></div>
+    <div class="tile call" onclick="call('1427')"><div class="icon">🏛️</div><div class="label">Seguridad Castro</div><div class="sub">1427</div></div>
+    <div class="tile call" onclick="call('1527')"><div class="icon">🏛️</div><div class="label">Seguridad Quilpué</div><div class="sub">1527</div></div>
     <div class="tile call" onclick="call(planNum)"><div class="icon">🚓</div><div class="label">Plan Cuadrante</div></div>
     <div class="tile call" onclick="call(freeNum)"><div class="icon">⭐</div><div class="label">Contacto Libre</div></div>
   </div>
@@ -185,19 +187,15 @@ function sendAlert(type){
     const message =
 `${type}
 📍 https://www.google.com/maps?q=${lat},${lon}
-Seguridad Aquí Vecino · Chiloé`;
+Seguridad AquíVecino · Chile`;
 
     st.textContent = "Compartiendo alerta…";
 
     if(navigator.share){
-      await navigator.share({
-        title: "Emergencia",
-        text: message
-      });
+      await navigator.share({ title:"Emergencia", text: message });
     }else{
       location.href =
-        "https://api.whatsapp.com/send?text=" +
-        encodeURIComponent(message);
+        "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
     }
 
     st.textContent = "Alerta lista para enviar";
