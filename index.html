@@ -2,156 +2,284 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Seguridad Aquí Vecino</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seguridad Aquí Vecino</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0b1a2a">
+<meta name="theme-color" content="#0b1220">
 
 <style>
+:root{
+  --bg:#0b1220;
+  --panel:#14213d;
+  --press:#1f3a8a;
+  --txt:#ffffff;
+  --mut:rgba(255,255,255,.8);
+}
+*{box-sizing:border-box}
 body{
   margin:0;
-  font-family: system-ui, Arial;
-  background: linear-gradient(180deg,#0b1a2a,#102840);
-  color:#fff;
+  font-family:system-ui, Arial, sans-serif;
+  background:linear-gradient(180deg,#0b1220,#14213d);
+  color:var(--txt);
 }
 header{
+  padding:16px 12px 10px;
   text-align:center;
-  padding:20px 10px 10px;
+  position:relative;
 }
-header h1{margin:0;font-size:22px;}
-header p{margin:4px 0 0;font-size:14px;opacity:.85}
+header h1{margin:0;font-size:22px}
+header p{margin:6px 0 0;font-size:13px;opacity:.85}
+.settings{
+  position:absolute;right:12px;top:14px;
+  font-size:20px;cursor:pointer;opacity:.85;
+}
+.settings:active{transform:scale(.9)}
 
-.container{padding:15px;max-width:900px;margin:auto}
+.section{padding:14px}
+.section h3{margin:8px 0 12px;font-size:14px;opacity:.9}
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:12px;
 }
-@media(min-width:600px){
-  .grid{grid-template-columns:repeat(4,1fr);}
+.grid.big{
+  grid-template-columns:repeat(3,1fr);
 }
-
-.card{
-  background:rgba(255,255,255,.08);
-  border-radius:14px;
-  padding:14px;
+.tile{
+  background:var(--panel);
+  border-radius:18px;
+  padding:14px 8px;
   text-align:center;
   cursor:pointer;
+  user-select:none;
+  transition:transform .06s ease, background .15s ease, box-shadow .15s ease;
+  box-shadow:0 8px 18px rgba(0,0,0,.25);
 }
-.card:active{transform:scale(.98)}
-.icon{font-size:34px}
-.label{margin-top:6px;font-weight:600;font-size:14px}
-.sub{font-size:12px;opacity:.8}
+.tile:active{
+  transform:scale(.94);
+  background:var(--press);
+}
+.icon{font-size:34px;line-height:1}
+.label{margin-top:6px;font-weight:800;font-size:13px}
+.sub{font-size:12px;color:var(--mut);margin-top:2px}
 
-.panic{
-  background:#c62828;
-  border-radius:18px;
-  padding:20px;
-  margin:20px 0;
+.fire{background:#b91c1c}
+.rob{background:#d97706}
+.med{background:#047857}
+.siren{background:#7f1d1d}
+.call{background:#1f2a44}
+
+.status{
   text-align:center;
-  font-size:18px;
-  font-weight:700;
+  font-size:12px;
+  color:var(--mut);
+  margin-top:8px;
 }
-.panic small{display:block;font-size:13px;font-weight:400;margin-top:6px}
 
-.btn{margin-top:8px;padding:10px;border-radius:10px;background:#162c44}
-input{
-  width:100%;
-  margin-top:6px;
-  padding:10px;
-  border-radius:10px;
-  border:none;
+/* ===== MODAL AJUSTES ===== */
+.modalBg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
 }
+.modal{
+  width:100%;
+  max-width:420px;
+  background:#0f1a33;
+  border-radius:18px;
+  padding:14px;
+}
+.modal h4{margin:0 0 10px}
+.field{margin-bottom:10px}
+.field label{font-size:12px;opacity:.9}
+.field input{
+  width:100%;
+  padding:10px;
+  border-radius:12px;
+  border:none;
+  background:#1f2a44;
+  color:#fff;
+}
+.btn{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:none;
+  background:#2563eb;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn.secondary{background:#374151;margin-top:8px}
 </style>
 </head>
 
 <body>
+
 <header>
+  <div class="settings" onclick="openSettings()">⚙️</div>
   <h1>Seguridad Aquí Vecino</h1>
-  <p>Ayudando a Chiloé</p>
+  <p>Chiloé · Para un Chiloé más seguro</p>
 </header>
 
-<div class="container">
-
-<div class="grid" id="emergencias"></div>
-
-<div class="panic" onclick="activarPanico()">
-  🚨 BOTÓN DE PÁNICO
-  <small>Seguridad Comunitaria · Aquí Vecino</small>
+<!-- EMERGENCIAS COMUNITARIAS -->
+<div class="section">
+  <h3>🚨 Aviso inmediato a la comunidad (WhatsApp + GPS)</h3>
+  <div class="grid big">
+    <div class="tile fire" onclick="sendAlert('🔥 INCENDIO FORESTAL')">
+      <div class="icon">🔥</div>
+      <div class="label">Incendio</div>
+    </div>
+    <div class="tile rob" onclick="sendAlert('🚨 ROBO / ASALTO')">
+      <div class="icon">🚨</div>
+      <div class="label">Robo</div>
+    </div>
+    <div class="tile med" onclick="sendAlert('🚑 EMERGENCIA MÉDICA')">
+      <div class="icon">🚑</div>
+      <div class="label">Médica</div>
+    </div>
+  </div>
+  <div class="status" id="status">Pulsa un botón para avisar a la comunidad</div>
 </div>
 
-<h3>Mis contactos de emergencia</h3>
-<div id="contactos"></div>
+<!-- PÁNICO FÍSICO -->
+<div class="section">
+  <h3>🔊 Pánico físico (alarma sonora)</h3>
+  <div class="grid">
+    <div class="tile siren" onclick="toggleSiren()">
+      <div class="icon">🔊</div>
+      <div class="label">Sirena</div>
+    </div>
+  </div>
+</div>
 
+<!-- EMERGENCIAS OFICIALES -->
+<div class="section">
+  <h3>📞 Emergencias oficiales (llamada)</h3>
+  <div class="grid">
+    <div class="tile call" onclick="call('131')"><div class="icon">🚑</div><div class="label">SAMU</div><div class="sub">131</div></div>
+    <div class="tile call" onclick="call('132')"><div class="icon">🚒</div><div class="label">Bomberos</div><div class="sub">132</div></div>
+    <div class="tile call" onclick="call('133')"><div class="icon">👮</div><div class="label">Carabineros</div><div class="sub">133</div></div>
+    <div class="tile call" onclick="call('134')"><div class="icon">🕵️</div><div class="label">PDI</div><div class="sub">134</div></div>
+    <div class="tile call" onclick="call('130')"><div class="icon">🌲</div><div class="label">CONAF</div><div class="sub">130</div></div>
+    <div class="tile call" onclick="call('*4242')"><div class="icon">📣</div><div class="label">Denuncia</div><div class="sub">*4242</div></div>
+    <div class="tile call" onclick="call('*4141')"><div class="icon">🧠</div><div class="label">Salud</div><div class="sub">*4141</div></div>
+    <div class="tile call" onclick="call('223451100')"><div class="icon">🐄</div><div class="label">SAG</div><div class="sub">Denuncias</div></div>
+    <div class="tile call" onclick="call('1427')"><div class="icon">🏛️</div><div class="label">Castro</div><div class="sub">1427</div></div>
+    <div class="tile call" onclick="call('1527')"><div class="icon">🏛️</div><div class="label">Quilpué</div><div class="sub">1527</div></div>
+    <div class="tile call" onclick="call(planNum)"><div class="icon">🚓</div><div class="label">Plan Cuadrante</div></div>
+    <div class="tile call" onclick="call(freeNum)"><div class="icon">⭐</div><div class="label">Contacto Libre</div></div>
+  </div>
+</div>
+
+<!-- AJUSTES -->
+<div class="modalBg" id="modalBg">
+  <div class="modal">
+    <h4>⚙️ Ajustes</h4>
+    <div class="field">
+      <label>Plan Cuadrante (teléfono)</label>
+      <input id="planInput" placeholder="Ej: 9XXXXXXXX">
+    </div>
+    <div class="field">
+      <label>Contacto Libre (teléfono)</label>
+      <input id="freeInput" placeholder="Ej: 9XXXXXXXX">
+    </div>
+    <button class="btn" onclick="saveSettings()">Guardar</button>
+    <button class="btn secondary" onclick="closeSettings()">Cerrar</button>
+  </div>
 </div>
 
 <script>
-const emergencias=[
-{n:'SAMU',t:'131',i:'🚑'},
-{n:'Bomberos',t:'132',i:'🚒'},
-{n:'Carabineros',t:'133',i:'👮'},
-{n:'PDI',t:'134',i:'🕵️'},
-{n:'CONAF',t:'130',i:'🌲'},
-{n:'Denuncia Seguro',t:'*4242',i:'📣'},
-{n:'Salud Mental',t:'*4141',i:'🧠'},
-{n:'Seg. Ciudadana Castro',t:'1427',i:'🏛️'}
-];
+/* ===== CONFIGURACIÓN CLAVE ===== */
+const WHATSAPP_GROUP_LINK =
+  "https://chat.whatsapp.com/LpLiMQTMeW8BzvY5CSsimV";
+/* ============================== */
 
-const MAX=10;
-let contactos=JSON.parse(localStorage.getItem('av_cont'))||
-Array.from({length:MAX},()=>({n:'',t:''}));
+let planNum = localStorage.getItem("planNum") || "";
+let freeNum = localStorage.getItem("freeNum") || "";
 
-function render(){
-  const e=document.getElementById('emergencias');
-  e.innerHTML='';
-  emergencias.forEach(x=>{
-    e.innerHTML+=`
-    <div class="card" onclick="location.href='tel:${x.t}'">
-      <div class="icon">${x.i}</div>
-      <div class="label">${x.n}</div>
-      <div class="sub">${x.t}</div>
-    </div>`;
-  });
-
-  const c=document.getElementById('contactos');
-  c.innerHTML='';
-  contactos.forEach((x,i)=>{
-    c.innerHTML+=`
-    <input placeholder="Nombre" value="${x.n}" onchange="contactos[${i}].n=this.value;save()">
-    <input placeholder="Teléfono (+56…)" value="${x.t}" onchange="contactos[${i}].t=this.value;save()">
-    <div class="btn" onclick="llamar(${i})">📞 Llamar</div>
-    <div class="btn" onclick="sms(${i})">✉️ SMS</div>
-    <div class="btn" onclick="wa(${i})">🟢 WhatsApp</div>
-    <hr>`;
-  });
+function call(num){
+  if(num) location.href = "tel:" + num;
 }
-function save(){localStorage.setItem('av_cont',JSON.stringify(contactos));}
-function llamar(i){if(contactos[i].t)location.href='tel:'+contactos[i].t;}
-function sms(i){if(contactos[i].t)location.href='sms:'+contactos[i].t;}
-function wa(i){sendWA(contactos[i].t);}
 
-function activarPanico(){
+function sendAlert(type){
+  const st = document.getElementById("status");
+  st.textContent = "Obteniendo ubicación…";
+
   navigator.geolocation.getCurrentPosition(pos=>{
-    const {latitude,longitude,accuracy}=pos.coords;
-    let msg="🚨 EMERGENCIA – Seguridad Aquí Vecino\nPor favor, necesito ayuda.";
-    if(accuracy<100){
-      msg+=`\n📍 https://maps.google.com/?q=${latitude},${longitude}`;
-    }
-    enviarSecuencial(msg,0);
+    const msg =
+`${type}
+📍 https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}
+Seguridad Aquí Vecino · Chiloé`;
+
+    st.textContent = "Abriendo WhatsApp…";
+    location.href =
+      WHATSAPP_GROUP_LINK + "?text=" + encodeURIComponent(msg);
   },()=>{
-    enviarSecuencial("🚨 EMERGENCIA – Seguridad Aquí Vecino\nPor favor, necesito ayuda.",0);
-  },{enableHighAccuracy:true,timeout:30000,maximumAge:0});
+    st.textContent = "No se pudo obtener ubicación";
+  });
 }
 
-function enviarSecuencial(msg,i){
-  if(i>=contactos.length) return;
-  if(!contactos[i].t) return enviarSecuencial(msg,i+1);
-  const num=contactos[i].t.replace(/\D/g,'');
-  window.location.href=`https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+/* ===== SIRENA REAL, AGRESIVA ===== */
+let audioCtx=null, osc=null, gain=null, sirenTimer=null;
+function toggleSiren(){
+  if(osc){ stopSiren(); return; }
+
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  osc = audioCtx.createOscillator();
+  gain = audioCtx.createGain();
+
+  osc.type = "square";
+  osc.frequency.value = 1200;
+  gain.gain.value = 0.7;
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+
+  let hi=true;
+  sirenTimer = setInterval(()=>{
+    osc.frequency.value = hi ? 1600 : 700;
+    hi=!hi;
+  },300);
+
+  if(navigator.vibrate){
+    navigator.vibrate([600,200,600,200,600]);
+  }
+}
+function stopSiren(){
+  clearInterval(sirenTimer);
+  if(osc){
+    osc.stop();
+    osc.disconnect();
+    gain.disconnect();
+  }
+  osc=null;
+  if(navigator.vibrate) navigator.vibrate(0);
 }
 
-render();
+/* ===== AJUSTES ===== */
+function openSettings(){
+  document.getElementById("modalBg").style.display="flex";
+  planInput.value = planNum;
+  freeInput.value = freeNum;
+}
+function closeSettings(){
+  document.getElementById("modalBg").style.display="none";
+}
+function saveSettings(){
+  planNum = planInput.value.trim();
+  freeNum = freeInput.value.trim();
+  localStorage.setItem("planNum", planNum);
+  localStorage.setItem("freeNum", freeNum);
+  closeSettings();
+}
 </script>
+
 </body>
 </html>
