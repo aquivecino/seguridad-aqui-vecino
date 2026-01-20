@@ -9,28 +9,33 @@
 
 <style>
 :root{
-  --panel:#14213d;
-  --press:#1f3a8a;
-  --txt:#fff;
-  --mut:rgba(255,255,255,.8);
+  --bg:#0b1220; --panel:#14213d; --press:#1f3a8a;
+  --txt:#ffffff; --mut:rgba(255,255,255,.8);
 }
+*{box-sizing:border-box}
 body{
-  margin:0;
-  font-family:system-ui, Arial, sans-serif;
-  background:linear-gradient(180deg,#0b1220,#14213d);
-  color:var(--txt);
+  margin:0;font-family:system-ui, Arial, sans-serif;
+  background:linear-gradient(180deg,#0b1220,#14213d);color:var(--txt);
 }
-header{text-align:center;padding:14px}
+header{padding:16px 12px 10px;text-align:center;position:relative}
+header h1{margin:0;font-size:22px}
+header p{margin:6px 0 0;font-size:13px;opacity:.85}
+.settings{position:absolute;right:12px;top:14px;font-size:20px;cursor:pointer;opacity:.85}
+.settings:active{transform:scale(.9)}
+
 .section{padding:14px}
+.section h3{margin:8px 0 12px;font-size:14px;opacity:.9}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .tile{
   background:var(--panel);border-radius:18px;padding:14px 8px;
-  text-align:center;cursor:pointer;user-select:none
+  text-align:center;cursor:pointer;user-select:none;
+  transition:transform .06s ease, background .15s ease
 }
-.tile:active{background:var(--press)}
-.icon{font-size:34px}
-.label{font-weight:800;font-size:13px;margin-top:6px}
-.sub{font-size:12px;color:var(--mut)}
+.tile:active{transform:scale(.94);background:var(--press)}
+.icon{font-size:34px;line-height:1}
+.label{margin-top:6px;font-weight:800;font-size:13px}
+.sub{font-size:12px;color:var(--mut);margin-top:2px}
+
 .fire{background:#b91c1c}
 .rob{background:#d97706}
 .med{background:#047857}
@@ -39,56 +44,79 @@ header{text-align:center;padding:14px}
 .siren{background:#7f1d1d}
 .call{background:#1f2a44}
 
-/* MODALES */
+.status{text-align:center;font-size:12px;color:var(--mut);margin-top:8px}
+
+/* SPLASH */
+#splash{
+  position:fixed;inset:0;background:#0b1220;color:#fff;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  z-index:10000;text-align:center
+}
+#splash h1{margin:0;font-size:22px}
+#splash p{margin:6px 0;font-size:13px;opacity:.85}
+#splash .ver{font-size:12px;opacity:.7}
+
+/* MODAL AJUSTES */
 .modalBg{
-  position:fixed;inset:0;background:rgba(0,0,0,.6);
-  display:none;align-items:center;justify-content:center;z-index:9999
+  position:fixed; inset:0; background:rgba(0,0,0,.6);
+  display:none; align-items:center; justify-content:center; padding:14px; z-index:9000
 }
 .modal{
-  background:#0f1a33;border-radius:18px;padding:14px;width:90%
+  width:100%; max-width:420px; background:#0f1a33;
+  border-radius:18px; padding:14px
 }
-textarea{
-  width:100%;background:#1f2a44;color:#fff;
-  border:none;border-radius:12px;padding:10px
+.modal h4{margin:0 0 10px}
+.field{margin-bottom:10px}
+.field label{font-size:12px}
+.field input, .field textarea{
+  width:100%; padding:10px; border-radius:12px; border:none;
+  background:#1f2a44; color:#fff; resize:none
 }
-button{
-  width:100%;margin-top:10px;padding:12px;
-  border:none;border-radius:14px;
-  background:#2563eb;color:#fff;font-weight:800
+.btn{
+  width:100%; padding:12px; border-radius:14px; border:none;
+  background:#2563eb; color:#fff; font-weight:800
 }
-button.secondary{background:#374151}
+.btn.secondary{background:#374151;margin-top:8px}
 </style>
 </head>
 
 <body>
 
+<div id="splash">
+  <h1>Seguridad AquíVecino</h1>
+  <p>Creado por Neftali Espinoza Águila</p>
+  <p class="ver">Versión 1.0.2</p>
+</div>
+
 <header>
+  <div class="settings" onclick="openSettings()">⚙️</div>
   <h1>Seguridad AquíVecino</h1>
   <p>Chile · Para un Chile más seguro</p>
 </header>
 
 <!-- AVISO -->
 <div class="section">
-  <h3>🚨 Aviso inmediato</h3>
+  <h3>🚨 Aviso inmediato a la comunidad</h3>
   <div class="grid">
     <div class="tile track" onclick="shareLocation()"><div class="icon">📍</div><div class="label">Mi ubicación</div></div>
     <div class="tile fire" onclick="sendAlert('🔥 INCENDIO FORESTAL')"><div class="icon">🔥</div><div class="label">Incendio</div></div>
     <div class="tile rob" onclick="sendAlert('🚨 ROBO / ASALTO')"><div class="icon">🚨</div><div class="label">Robo</div></div>
     <div class="tile med" onclick="sendAlert('🚑 EMERGENCIA MÉDICA')"><div class="icon">🚑</div><div class="label">Médica</div></div>
   </div>
+  <div class="status" id="status">Pulsa un botón para avisar</div>
 </div>
 
 <!-- SIRENA -->
 <div class="section">
-  <h3>🔊 Pánico</h3>
+  <h3>🔊 Pánico físico</h3>
   <div class="grid">
     <div class="tile siren" onclick="toggleSiren()"><div class="icon">🔊</div><div class="label">Sirena</div></div>
   </div>
 </div>
 
-<!-- REPORTE -->
+<!-- REPORTE (AISLADO Y SEGURO) -->
 <div class="section">
-  <h3>🧾 Reportes</h3>
+  <h3>🧾 Reportes y Evidencias</h3>
   <div class="grid">
     <div class="tile report" onclick="openReport()">
       <div class="icon">📸</div>
@@ -100,18 +128,31 @@ button.secondary{background:#374151}
 
 <!-- EMERGENCIAS -->
 <div class="section">
-  <h3>📞 Emergencias</h3>
+  <h3>📞 Emergencias oficiales</h3>
   <div class="grid">
-    <div class="tile call" onclick="call('131')">🚑<div class="label">SAMU</div></div>
-    <div class="tile call" onclick="call('132')">🚒<div class="label">Bomberos</div></div>
-    <div class="tile call" onclick="call('133')">👮<div class="label">Carabineros</div></div>
-    <div class="tile call" onclick="call('134')">🕵️<div class="label">PDI</div></div>
-    <div class="tile call" onclick="call('130')">🌲<div class="label">CONAF</div></div>
-    <div class="tile call" onclick="call('*4242')">📣<div class="label">Denuncia</div></div>
-    <div class="tile call" onclick="call('*4141')">🧠<div class="label">Salud</div></div>
-    <div class="tile call" onclick="call('223451100')">🐄<div class="label">SAG</div></div>
-    <div class="tile call" onclick="call('1427')">🏛️<div class="label">Castro</div></div>
-    <div class="tile call" onclick="call('1527')">🏛️<div class="label">Quilpué</div></div>
+    <div class="tile call" onclick="call('131')"><div class="icon">🚑</div><div class="label">SAMU</div><div class="sub">131</div></div>
+    <div class="tile call" onclick="call('132')"><div class="icon">🚒</div><div class="label">Bomberos</div><div class="sub">132</div></div>
+    <div class="tile call" onclick="call('133')"><div class="icon">👮</div><div class="label">Carabineros</div><div class="sub">133</div></div>
+    <div class="tile call" onclick="call('134')"><div class="icon">🕵️</div><div class="label">PDI</div><div class="sub">134</div></div>
+    <div class="tile call" onclick="call('130')"><div class="icon">🌲</div><div class="label">CONAF</div><div class="sub">130</div></div>
+    <div class="tile call" onclick="call('*4242')"><div class="icon">📣</div><div class="label">Denuncia</div><div class="sub">*4242</div></div>
+    <div class="tile call" onclick="call('*4141')"><div class="icon">🧠</div><div class="label">Salud</div><div class="sub">*4141</div></div>
+    <div class="tile call" onclick="call('223451100')"><div class="icon">🐄</div><div class="label">SAG</div><div class="sub">Denuncias</div></div>
+    <div class="tile call" onclick="call('1427')"><div class="icon">🏛️</div><div class="label">Seguridad Castro</div><div class="sub">1427</div></div>
+    <div class="tile call" onclick="call('1527')"><div class="icon">🏛️</div><div class="label">Seguridad Quilpué</div><div class="sub">1527</div></div>
+    <div class="tile call" onclick="call(planNum)"><div class="icon">🚓</div><div class="label">Plan Cuadrante</div></div>
+    <div class="tile call" onclick="call(freeNum)"><div class="icon">⭐</div><div class="label">Contacto Libre</div></div>
+  </div>
+</div>
+
+<!-- AJUSTES -->
+<div class="modalBg" id="modalBg">
+  <div class="modal">
+    <h4>⚙️ Ajustes</h4>
+    <div class="field"><label>Plan Cuadrante</label><input id="planInput" placeholder="Ej: 9XXXXXXXX"></div>
+    <div class="field"><label>Contacto Libre</label><input id="freeInput" placeholder="Ej: 9XXXXXXXX"></div>
+    <button class="btn" onclick="saveSettings()">Guardar</button>
+    <button class="btn secondary" onclick="closeSettings()">Cerrar</button>
   </div>
 </div>
 
@@ -119,76 +160,101 @@ button.secondary{background:#374151}
 <div class="modalBg" id="reportModal">
   <div class="modal">
     <h4>📸 Reporte / Evidencia</h4>
-    <textarea id="reportText" rows="3" placeholder="Observación breve"></textarea>
-    <button onclick="takePhoto()">Tomar fotografía</button>
-    <button class="secondary" onclick="closeReport()">Cancelar</button>
+    <div class="field">
+      <label>Observación breve</label>
+      <textarea id="reportText" rows="3" placeholder="Ej: accidente, animal herido…"></textarea>
+    </div>
+    <button class="btn" onclick="takePhoto()">Tomar fotografía</button>
+    <button class="btn secondary" onclick="closeReport()">Cancelar</button>
   </div>
 </div>
 
 <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
 
 <script>
-function call(n){location.href="tel:"+n;}
-function shareLocation(){
-  navigator.geolocation.getCurrentPosition(p=>{
-    const m=`📍 https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-    navigator.share({text:m});
-  });
+let planNum=localStorage.getItem("planNum")||"";
+let freeNum=localStorage.getItem("freeNum")||"";
+
+function call(n){ if(n) location.href="tel:"+n; }
+
+function sendAlert(type){
+  const st=document.getElementById("status"); st.textContent="Obteniendo ubicación…";
+  navigator.geolocation.getCurrentPosition(async p=>{
+    const msg=`${type}\n📍 https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}\nSeguridad AquíVecino`;
+    if(navigator.share) await navigator.share({text:msg});
+    else location.href="https://api.whatsapp.com/send?text="+encodeURIComponent(msg);
+    st.textContent="Alerta lista para enviar";
+  },()=>st.textContent="No se pudo obtener ubicación");
 }
-function sendAlert(t){
-  navigator.geolocation.getCurrentPosition(p=>{
-    const m=`${t}\n📍 https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-    navigator.share({text:m});
-  });
+
+function shareLocation(){
+  const st=document.getElementById("status"); st.textContent="Obteniendo ubicación…";
+  navigator.geolocation.getCurrentPosition(async p=>{
+    const msg=`📍 Mi ubicación\nhttps://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
+    if(navigator.share) await navigator.share({text:msg});
+    else location.href="https://api.whatsapp.com/send?text="+encodeURIComponent(msg);
+    st.textContent="Ubicación compartida";
+  },()=>st.textContent="No se pudo obtener ubicación");
 }
 
 /* Sirena */
-let osc,ctx;
+let ctx=null,osc=null,timer=null;
 function toggleSiren(){
-  if(osc){osc.stop();osc=null;return;}
-  ctx=new AudioContext();
-  osc=ctx.createOscillator();
-  osc.type="square";osc.frequency.value=1200;
-  osc.connect(ctx.destination);osc.start();
+  if(osc){stopSiren();return;}
+  ctx=new (AudioContext||webkitAudioContext)();
+  osc=ctx.createOscillator(); osc.type="square"; osc.frequency.value=1200;
+  osc.connect(ctx.destination); osc.start();
+  let hi=true; timer=setInterval(()=>{osc.frequency.value=hi?1600:700;hi=!hi;},300);
+}
+function stopSiren(){ clearInterval(timer); if(osc){osc.stop();osc=null;} }
+
+/* Ajustes */
+function openSettings(){ modalBg.style.display="flex"; planInput.value=planNum; freeInput.value=freeNum; }
+function closeSettings(){ modalBg.style.display="none"; }
+function saveSettings(){
+  planNum=planInput.value.trim(); freeNum=freeInput.value.trim();
+  localStorage.setItem("planNum",planNum); localStorage.setItem("freeNum",freeNum);
+  closeSettings();
 }
 
-/* Reporte PRO */
-function openReport(){reportModal.style.display="flex";}
-function closeReport(){reportModal.style.display="none";}
-function takePhoto(){cameraInput.click();}
+/* Reporte PRO (aislado, con compresión y fallback) */
+function openReport(){ reportModal.style.display="flex"; }
+function closeReport(){ reportModal.style.display="none"; }
+function takePhoto(){ cameraInput.click(); }
 
 cameraInput.onchange=()=>{
   const file=cameraInput.files[0];
   const text=document.getElementById("reportText").value||"";
-  compressImage(file,async blob=>{
+  if(!file){ closeReport(); return; }
+  compressImage(file, async blob=>{
     navigator.geolocation.getCurrentPosition(async p=>{
       const msg=`📸 REPORTE\n${text}\n📍 https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-      await navigator.share({text:msg,files:[new File([blob],"reporte.jpg",{type:"image/jpeg"})]});
+      if(navigator.canShare && navigator.canShare({files:[new File([blob],"reporte.jpg",{type:"image/jpeg"})]})){
+        await navigator.share({text:msg,files:[new File([blob],"reporte.jpg",{type:"image/jpeg"})]});
+      }else{
+        await navigator.share({text:msg});
+      }
       closeReport();
-    });
+    },()=>closeReport());
   });
 };
 
 function compressImage(file,cb){
-  const img=new Image();
-  const r=new FileReader();
-  r.onload=e=>{
-    img.onload=()=>{
-      const c=document.createElement("canvas");
-      const max=1280;
-      let w=img.width,h=img.height;
-      if(w>h&&w>max){h*=max/w;w=max}
-      if(h>w&&h>max){w*=max/h;h=max}
-      c.width=w;c.height=h;
-      c.getContext("2d").drawImage(img,0,0,w,h);
-      c.toBlob(cb,"image/jpeg",0.7);
-    };
-    img.src=e.target.result;
-  };
+  const img=new Image(); const r=new FileReader();
+  r.onload=e=>{ img.onload=()=>{
+    const c=document.createElement("canvas");
+    const max=1280; let w=img.width,h=img.height;
+    if(w>h&&w>max){h*=max/w;w=max}
+    if(h>w&&h>max){w*=max/h;h=max}
+    c.width=w;c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    c.toBlob(cb,"image/jpeg",0.7);
+  }; img.src=e.target.result; };
   r.readAsDataURL(file);
 }
+
+setTimeout(()=>{const s=document.getElementById("splash");if(s)s.remove();},1500);
 </script>
 
 </body>
 </html>
-
