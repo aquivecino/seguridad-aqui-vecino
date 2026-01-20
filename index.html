@@ -29,11 +29,6 @@ header{
 }
 header h1{margin:0;font-size:22px}
 header p{margin:6px 0 0;font-size:13px;opacity:.85}
-.settings{
-  position:absolute;right:12px;top:14px;
-  font-size:20px;cursor:pointer;opacity:.85;
-}
-.settings:active{transform:scale(.9)}
 
 .section{padding:14px}
 .section h3{margin:8px 0 12px;font-size:14px;opacity:.9}
@@ -63,6 +58,8 @@ header p{margin:6px 0 0;font-size:13px;opacity:.85}
 .fire{background:#b91c1c}
 .rob{background:#d97706}
 .med{background:#047857}
+.track{background:#0369a1}
+.report{background:#4c1d95}
 .siren{background:#7f1d1d}
 .call{background:#1f2a44}
 
@@ -73,10 +70,28 @@ header p{margin:6px 0 0;font-size:13px;opacity:.85}
   margin-top:8px;
 }
 
-/* MODAL AJUSTES */
+/* SPLASH */
+#splash{
+  position:fixed;
+  inset:0;
+  background:#0b1220;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:10000;
+  text-align:center;
+}
+#splash h1{margin:0;font-size:22px}
+#splash p{margin:6px 0;font-size:13px;opacity:.85}
+#splash .ver{font-size:12px;opacity:.7}
+
+/* MODAL REPORTE */
 .modalBg{
   position:fixed; inset:0; background:rgba(0,0,0,.6);
   display:none; align-items:center; justify-content:center; padding:14px;
+  z-index:9000;
 }
 .modal{
   width:100%; max-width:420px; background:#0f1a33;
@@ -84,10 +99,9 @@ header p{margin:6px 0 0;font-size:13px;opacity:.85}
 }
 .modal h4{margin:0 0 10px}
 .field{margin-bottom:10px}
-.field label{font-size:12px}
-.field input{
+.field textarea{
   width:100%; padding:10px; border-radius:12px; border:none;
-  background:#1f2a44; color:#fff;
+  background:#1f2a44; color:#fff; resize:none;
 }
 .btn{
   width:100%; padding:12px; border-radius:14px; border:none;
@@ -99,25 +113,25 @@ header p{margin:6px 0 0;font-size:13px;opacity:.85}
 
 <body>
 
+<div id="splash">
+  <h1>Seguridad AquíVecino</h1>
+  <p>Creado por Neftali Espinoza</p>
+  <p class="ver">Versión 1.0.3</p>
+</div>
+
 <header>
-  <div class="settings" onclick="openSettings()">⚙️</div>
   <h1>Seguridad AquíVecino</h1>
   <p>Chile · Para un Chile más seguro</p>
 </header>
 
-<!-- EMERGENCIAS COMUNITARIAS -->
+<!-- AVISO COMUNITARIO -->
 <div class="section">
   <h3>🚨 Aviso inmediato a la comunidad</h3>
   <div class="grid">
-    <div class="tile fire" onclick="sendAlert('🔥 INCENDIO FORESTAL')">
-      <div class="icon">🔥</div><div class="label">Incendio</div>
-    </div>
-    <div class="tile rob" onclick="sendAlert('🚨 ROBO / ASALTO')">
-      <div class="icon">🚨</div><div class="label">Robo</div>
-    </div>
-    <div class="tile med" onclick="sendAlert('🚑 EMERGENCIA MÉDICA')">
-      <div class="icon">🚑</div><div class="label">Médica</div>
-    </div>
+    <div class="tile track" onclick="shareLocation()"><div class="icon">📍</div><div class="label">Mi ubicación</div></div>
+    <div class="tile fire" onclick="sendAlert('🔥 INCENDIO FORESTAL')"><div class="icon">🔥</div><div class="label">Incendio</div></div>
+    <div class="tile rob" onclick="sendAlert('🚨 ROBO / ASALTO')"><div class="icon">🚨</div><div class="label">Robo</div></div>
+    <div class="tile med" onclick="sendAlert('🚑 EMERGENCIA MÉDICA')"><div class="icon">🚑</div><div class="label">Médica</div></div>
   </div>
   <div class="status" id="status">Pulsa un botón para avisar</div>
 </div>
@@ -126,13 +140,23 @@ header p{margin:6px 0 0;font-size:13px;opacity:.85}
 <div class="section">
   <h3>🔊 Pánico físico</h3>
   <div class="grid">
-    <div class="tile siren" onclick="toggleSiren()">
-      <div class="icon">🔊</div><div class="label">Sirena</div>
+    <div class="tile siren" onclick="toggleSiren()"><div class="icon">🔊</div><div class="label">Sirena</div></div>
+  </div>
+</div>
+
+<!-- REPORTES -->
+<div class="section">
+  <h3>🧾 Reportes y Evidencias</h3>
+  <div class="grid">
+    <div class="tile report" onclick="openReport()">
+      <div class="icon">📸</div>
+      <div class="label">Reporte / Evidencia</div>
+      <div class="sub">Imagen + ubicación</div>
     </div>
   </div>
 </div>
 
-<!-- EMERGENCIAS OFICIALES -->
+<!-- EMERGENCIAS OFICIALES (TODAS) -->
 <div class="section">
   <h3>📞 Emergencias oficiales</h3>
   <div class="grid">
@@ -142,7 +166,7 @@ header p{margin:6px 0 0;font-size:13px;opacity:.85}
     <div class="tile call" onclick="call('134')"><div class="icon">🕵️</div><div class="label">PDI</div><div class="sub">134</div></div>
     <div class="tile call" onclick="call('130')"><div class="icon">🌲</div><div class="label">CONAF</div><div class="sub">130</div></div>
     <div class="tile call" onclick="call('*4242')"><div class="icon">📣</div><div class="label">Denuncia</div><div class="sub">*4242</div></div>
-    <div class="tile call" onclick="call('*4141')"><div class="icon">🧠</div><div class="label">Salud</div><div class="sub">*4141</div></div>
+    <div class="tile call" onclick="call('*4141')"><div class="icon">🧠</div><div class="label">Salud Responde</div><div class="sub">*4141</div></div>
     <div class="tile call" onclick="call('223451100')"><div class="icon">🐄</div><div class="label">SAG</div><div class="sub">Denuncias</div></div>
     <div class="tile call" onclick="call('1427')"><div class="icon">🏛️</div><div class="label">Seguridad Castro</div><div class="sub">1427</div></div>
     <div class="tile call" onclick="call('1527')"><div class="icon">🏛️</div><div class="label">Seguridad Quilpué</div><div class="sub">1527</div></div>
@@ -151,92 +175,85 @@ header p{margin:6px 0 0;font-size:13px;opacity:.85}
   </div>
 </div>
 
-<!-- AJUSTES -->
-<div class="modalBg" id="modalBg">
+<!-- MODAL REPORTE -->
+<div class="modalBg" id="reportModal">
   <div class="modal">
-    <h4>⚙️ Ajustes</h4>
+    <h4>📸 Reporte / Evidencia</h4>
     <div class="field">
-      <label>Plan Cuadrante</label>
-      <input id="planInput" placeholder="Ej: 9XXXXXXXX">
+      <textarea id="reportText" rows="3" placeholder="Observación breve (opcional)"></textarea>
     </div>
-    <div class="field">
-      <label>Contacto Libre</label>
-      <input id="freeInput" placeholder="Ej: 9XXXXXXXX">
-    </div>
-    <button class="btn" onclick="saveSettings()">Guardar</button>
-    <button class="btn secondary" onclick="closeSettings()">Cerrar</button>
+    <button class="btn" onclick="takePhoto()">Tomar fotografía</button>
+    <button class="btn secondary" onclick="closeReport()">Cancelar</button>
   </div>
 </div>
 
-<script>
-let planNum = localStorage.getItem("planNum") || "";
-let freeNum = localStorage.getItem("freeNum") || "";
+<input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
 
-function call(num){
-  if(num) location.href = "tel:" + num;
-}
+<script>
+let planNum=localStorage.getItem("planNum")||"";
+let freeNum=localStorage.getItem("freeNum")||"";
+
+function call(num){if(num)location.href="tel:"+num;}
 
 function sendAlert(type){
-  const st = document.getElementById("status");
-  st.textContent = "Obteniendo ubicación…";
-
+  const st=document.getElementById("status");
   navigator.geolocation.getCurrentPosition(async pos=>{
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-
-    const message =
-`${type}
-📍 https://www.google.com/maps?q=${lat},${lon}
-Seguridad AquíVecino · Chile`;
-
-    st.textContent = "Compartiendo alerta…";
-
-    if(navigator.share){
-      await navigator.share({ title:"Emergencia", text: message });
-    }else{
-      location.href =
-        "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
-    }
-
-    st.textContent = "Alerta lista para enviar";
-  },()=>{
-    st.textContent = "No se pudo obtener ubicación";
+    const msg=`${type}
+📍 https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+    navigator.share
+      ? await navigator.share({text:msg})
+      : location.href="https://api.whatsapp.com/send?text="+encodeURIComponent(msg);
+    st.textContent="Alerta lista";
   });
 }
 
-/* Sirena fuerte */
+function shareLocation(){
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const msg=`📍 Mi ubicación
+https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+    navigator.share
+      ? await navigator.share({text:msg})
+      : location.href="https://api.whatsapp.com/send?text="+encodeURIComponent(msg);
+  });
+}
+
+/* Sirena */
 let ctx=null,osc=null,gain=null,timer=null;
 function toggleSiren(){
-  if(osc){ stopSiren(); return; }
+  if(osc){stopSiren();return;}
   ctx=new (AudioContext||webkitAudioContext)();
   osc=ctx.createOscillator();
   gain=ctx.createGain();
-  osc.type="square"; osc.frequency.value=1200; gain.gain.value=.7;
-  osc.connect(gain); gain.connect(ctx.destination); osc.start();
+  osc.type="square";osc.frequency.value=1200;gain.gain.value=.7;
+  osc.connect(gain);gain.connect(ctx.destination);osc.start();
   let hi=true;
   timer=setInterval(()=>{osc.frequency.value=hi?1600:700;hi=!hi;},300);
-  if(navigator.vibrate) navigator.vibrate([600,200,600,200]);
 }
 function stopSiren(){
   clearInterval(timer);
   if(osc){osc.stop();osc=null;}
-  if(navigator.vibrate) navigator.vibrate(0);
 }
 
-/* Ajustes */
-function openSettings(){
-  modalBg.style.display="flex";
-  planInput.value=planNum; freeInput.value=freeNum;
-}
-function closeSettings(){ modalBg.style.display="none"; }
-function saveSettings(){
-  planNum=planInput.value.trim();
-  freeNum=freeInput.value.trim();
-  localStorage.setItem("planNum",planNum);
-  localStorage.setItem("freeNum",freeNum);
-  closeSettings();
-}
+/* Reporte */
+function openReport(){reportModal.style.display="flex";}
+function closeReport(){reportModal.style.display="none";}
+function takePhoto(){cameraInput.click();}
+cameraInput.onchange=()=>{
+  const text=document.getElementById("reportText").value||"";
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const msg=`📸 REPORTE
+${text}
+📍 https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+    if(navigator.share){
+      await navigator.share({text:msg,files:[cameraInput.files[0]]});
+    }
+    closeReport();
+  });
+};
+
+setTimeout(()=>{const s=document.getElementById("splash");if(s)s.remove();},1500);
 </script>
 
 </body>
 </html>
+
